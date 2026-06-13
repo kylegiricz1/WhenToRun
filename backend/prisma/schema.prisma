@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String          @id @default(uuid())
+  email           String          @unique
+  passwordHash    String
+  pushToken       String?
+  latitude        Float?
+  longitude       Float?
+  createdAt       DateTime        @default(now())
+  preferences     Preferences?
+  recommendations Recommendation[]
+  runLogs         RunLog[]
+}
+
+model Preferences {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id])
+  minTemp         Float     @default(45)
+  maxTemp         Float     @default(75)
+  preferMorning   Boolean   @default(true)
+  preferAfternoon Boolean   @default(false)
+  preferEvening   Boolean   @default(false)
+  activeDays      Int[]
+  updatedAt       DateTime  @updatedAt
+}
+
+model Recommendation {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  date        DateTime
+  windowStart DateTime
+  windowEnd   DateTime
+  summary     String
+  score       Float
+  createdAt   DateTime @default(now())
+  runLog      RunLog?
+}
+
+model RunLog {
+  id               String         @id @default(uuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+  recommendationId String?        @unique
+  recommendation   Recommendation? @relation(fields: [recommendationId], references: [id])
+  didRun           Boolean
+  date             DateTime
+  createdAt        DateTime       @default(now())
+}
