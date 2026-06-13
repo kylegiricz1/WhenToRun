@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth';
 
 dotenv.config();
 
@@ -13,6 +14,8 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Runtime API is running' });
 });
+
+app.use('/auth', authRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
